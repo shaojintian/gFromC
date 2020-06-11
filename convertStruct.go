@@ -8,14 +8,17 @@ import (
 )
 
 func convertStruct(input []string) {
-	//ansStrs := make([]string,0)
+	suffixAnnotation := ""
 
 	for index, line := range input {
 
+		// ""
 		if len(line) == 0 {
 			fmt.Println(line)
 			continue
 		}
+
+		//----------len line > 0--------------
 		//handle first line
 		if index == 0 {
 			lineSlice := strings.Fields(line)
@@ -23,19 +26,32 @@ func convertStruct(input []string) {
 			continue
 		}
 		//handle finish line
-		if index == len(input) - 1{
+		if index == len(input)-1 {
 			fmt.Println("}")
 			continue
 		}
-		//skip some lines
-		if (len(line) > 2 && line[0:2] == "//") || line[len(line)-1:] != ";" {
+		//skip "//....."
+		if len(line) >= 2 && line[0:2] == "//" {
 			fmt.Println(line)
 			continue
 		}
 
+		//skip end 不是";"结尾的
+		if line[len(line)-1:] != ";" {
+			lineSlice := strings.Split(line, ";")
+			if len(lineSlice) >= 2 {
+				rawLine := line
+				line = lineSlice[0] + ";"
+				suffixAnnotation = rawLine[len(line):]
+			} else {
+				fmt.Println(line)
+				continue
+			}
+		}
+
 		//do convert logic
 		//suffix have ';'
-		line = doConvertStruct(line)
+		line = doConvertStruct(line, suffixAnnotation)
 
 		//print
 		fmt.Println(line)
@@ -43,7 +59,7 @@ func convertStruct(input []string) {
 
 }
 
-func doConvertStruct(codeLine string) string {
+func doConvertStruct(codeLine, suffixAnnotation string) string {
 	convertedCodeLine := ""
 	//delete ";"  suffix
 	if len(codeLine) == 0 {
@@ -52,7 +68,7 @@ func doConvertStruct(codeLine string) string {
 	codeLine = codeLine[0 : len(codeLine)-1]
 	lineSice := strings.Fields(codeLine) // [int a]
 	if len(lineSice) < 2 {
-		return codeLine
+		return codeLine + suffixAnnotation
 	} else {
 		if lineSice[0] == "struct" {
 			lineSice = lineSice[1:]
@@ -75,7 +91,7 @@ func doConvertStruct(codeLine string) string {
 		//add prefix stars in typ
 		typ = stars + typ
 		//package ans
-		convertedCodeLine = name + "	" + typ
+		convertedCodeLine = name + "	" + typ + suffixAnnotation
 
 	}
 	//int *a,*b,*c,*d; ---> a,b,c,d *int
