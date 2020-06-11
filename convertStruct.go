@@ -22,6 +22,11 @@ func convertStruct(input []string) {
 			fmt.Println("type " + lineSlice[1] + " struct {")
 			continue
 		}
+		//handle finish line
+		if index == len(input) - 1{
+			fmt.Println("}")
+			continue
+		}
 		//skip some lines
 		if (len(line) > 2 && line[0:2] == "//") || line[len(line)-1:] != ";" {
 			fmt.Println(line)
