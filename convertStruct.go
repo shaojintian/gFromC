@@ -12,16 +12,26 @@ import (
 func convertStruct(input []string){
 	//ansStrs := make([]string,0)
 
-	for _,line := range input{
+	for index,line := range input{
 
+		if len(line) == 0 {
+			fmt.Println(line)
+			continue
+		}
+		//handle first line
+		if index == 0{
+			lineSlice := strings.Fields(line)
+			fmt.Println("type "+lineSlice[1]+ " struct {")
+			continue
+		}
 		//skip some lines
-		if line == "" || (len(line)>2 && line[0:2] == "//") || (len(line)>0 && line[len(line)-1:] != ";"){
+		if (len(line)>2 && line[0:2] == "//") || line[len(line)-1:] != ";"{
 			fmt.Println(line)
 			continue
 		}
 
 		//do convert logic
-		//have ';'
+		//suffix have ';'
 		line = doConvertStruct(line)
 
 		//print
@@ -84,6 +94,9 @@ func handleInputStruct() []string{
 		curLine = strings.TrimSpace(curLine)
 		panicErr(err)
 		//check input illegal
+		if len(retStrs) == 0 && len(curLine) <=6{
+			continue
+		}
 		if len(retStrs) == 0 && len(curLine)>6 && curLine[0:6] != "struct"{
 			fmt.Println("please input legal struct C code")
 			os.Exit(0)
@@ -146,7 +159,6 @@ int keystep;
 // 统计信息
 // microseconds 记录了命令执行耗费的总毫微秒数
 // calls 是命令被执行的总次数
-long long microseconds, calls;
 };
  **/
 

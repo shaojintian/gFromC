@@ -1,6 +1,7 @@
 # gFromC
  a simple tool convert C code to Golang
 
+将C语言翻译为Go语言的简单工具
 
 ## How to use convert C struct 
 
