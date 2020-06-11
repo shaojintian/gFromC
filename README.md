@@ -16,9 +16,10 @@ Features:
 
 ```go
 
-go run convertStruct.go > ans.txt
+go run convertStruct.go < input.txt > ans.txt
 
-paste C struct code in terminal AND press RETURN key in keyboard
+
+paste C struct code in ./input.txt 
 
 converted result is in ./ans.txt
 

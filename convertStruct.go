@@ -7,25 +7,23 @@ import (
 	"strings"
 )
 
-
-
-func convertStruct(input []string){
+func convertStruct(input []string) {
 	//ansStrs := make([]string,0)
 
-	for index,line := range input{
+	for index, line := range input {
 
 		if len(line) == 0 {
 			fmt.Println(line)
 			continue
 		}
 		//handle first line
-		if index == 0{
+		if index == 0 {
 			lineSlice := strings.Fields(line)
-			fmt.Println("type "+lineSlice[1]+ " struct {")
+			fmt.Println("type " + lineSlice[1] + " struct {")
 			continue
 		}
 		//skip some lines
-		if (len(line)>2 && line[0:2] == "//") || line[len(line)-1:] != ";"{
+		if (len(line) > 2 && line[0:2] == "//") || line[len(line)-1:] != ";" {
 			fmt.Println(line)
 			continue
 		}
@@ -40,18 +38,18 @@ func convertStruct(input []string){
 
 }
 
-func doConvertStruct(codeLine string)string{
+func doConvertStruct(codeLine string) string {
 	convertedCodeLine := ""
 	//delete ";"  suffix
-	if len(codeLine) == 0{
+	if len(codeLine) == 0 {
 		return codeLine
 	}
-	codeLine = codeLine[0:len(codeLine)-1]
+	codeLine = codeLine[0 : len(codeLine)-1]
 	lineSice := strings.Fields(codeLine) // [int a]
-	if len(lineSice) < 2{
+	if len(lineSice) < 2 {
 		return codeLine
-	}else{
-		if lineSice[0] == "struct"{
+	} else {
+		if lineSice[0] == "struct" {
 			lineSice = lineSice[1:]
 		}
 		//
@@ -59,10 +57,10 @@ func doConvertStruct(codeLine string)string{
 		name := lineSice[1]
 		//get "**...." from name
 		flag := 0
-		for _,c := range name{
-			if c != '*'{
+		for _, c := range name {
+			if c != '*' {
 				break
-			}else {
+			} else {
 				flag++
 			}
 		}
@@ -70,7 +68,7 @@ func doConvertStruct(codeLine string)string{
 		stars := name[0:flag]
 		name = name[flag:]
 		//add prefix stars in typ
-		typ =  stars + typ
+		typ = stars + typ
 		//package ans
 		convertedCodeLine = name + "	" + typ
 
@@ -82,28 +80,25 @@ func doConvertStruct(codeLine string)string{
 	return convertedCodeLine
 }
 
-
-
-
-func handleInputStruct() []string{
-	retStrs := make([]string,0)
+func handleInputStruct() []string {
+	retStrs := make([]string, 0)
 	input := bufio.NewReader(os.Stdin)
-	fmt.Println("converted result is :\n")
-	for{
-		curLine,err := input.ReadString('\n')
+
+	for {
+		curLine, err := input.ReadString('\n')
 		curLine = strings.TrimSpace(curLine)
 		panicErr(err)
 		//check input illegal
-		if len(retStrs) == 0 && len(curLine) <=6{
+		if len(retStrs) == 0 && len(curLine) <= 6 {
 			continue
 		}
-		if len(retStrs) == 0 && len(curLine)>6 && curLine[0:6] != "struct"{
+		if len(retStrs) == 0 && len(curLine) > 6 && curLine[0:6] != "struct" {
 			fmt.Println("please input legal struct C code")
 			os.Exit(0)
 		}
-		retStrs = append(retStrs,curLine)
+		retStrs = append(retStrs, curLine)
 		//check finish flag
-		if curLine == "};"{
+		if len(curLine) > 0 && curLine[0] == '}' {
 			break
 		}
 	}
@@ -111,7 +106,7 @@ func handleInputStruct() []string{
 	return retStrs
 }
 
-func main()  {
+func main() {
 
 	//--------------input struct C code---------
 	input := handleInputStruct()
@@ -121,10 +116,9 @@ func main()  {
 
 }
 
-
-func panicErr(err error){
-	if err != nil{
-		panic(fmt.Errorf("---------%v",err))
+func panicErr(err error) {
+	if err != nil {
+		panic(fmt.Errorf("---------%v", err))
 	}
 }
 
@@ -161,5 +155,3 @@ int keystep;
 // calls 是命令被执行的总次数
 };
  **/
-
-
