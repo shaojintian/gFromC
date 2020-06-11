@@ -20,6 +20,7 @@ go run convertStruct.go > ans.txt
 
 paste C struct code in terminal AND press RETURN key in keyboard
 
+converted result is in ./ans.txt
 
 ```
 
