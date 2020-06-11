@@ -7,9 +7,9 @@
 
 Features:
 
--[x] Support basic operations
--[ ] Support multiple arg name ,eg: int a,b,c,d
--[ ] Support long long
+- [x] Support basic operations
+- [ ] Support multiple arg name ,eg: int a,b,c,d
+- [ ] Support long long
 
  
 
