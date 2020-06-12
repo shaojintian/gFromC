@@ -35,6 +35,7 @@ lerna-debug.log*
 
 
 # .go
+ans.go
 
 # .txt
 *.txt

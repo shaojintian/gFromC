@@ -61,37 +61,48 @@ func convertStruct(input []string) {
 
 func doConvertStruct(codeLine, suffixAnnotation string) string {
 	convertedCodeLine := ""
-	//delete ";"  suffix
 	if len(codeLine) == 0 {
 		return codeLine
 	}
+	//delete ";"  suffix
 	codeLine = codeLine[0 : len(codeLine)-1]
-	lineSice := strings.Fields(codeLine) // [int a]
-	if len(lineSice) < 2 {
+	//split [type,type,...,name]
+	lineSlice := strings.Fields(codeLine) // [int a]
+	if lineSlice[0] == "struct" {
+		lineSlice = lineSlice[1:]
+	}
+	if len(lineSlice) < 2 {
 		return codeLine + suffixAnnotation
-	} else {
-		if lineSice[0] == "struct" {
-			lineSice = lineSice[1:]
-		}
-		//
-		typ := lineSice[0]
-		name := lineSice[1]
+	} else if len(lineSlice) == 2{
+		typ := lineSlice[0]
+		name := lineSlice[1]
 		//get "**...." from name
-		flag := 0
-		for _, c := range name {
-			if c != '*' {
-				break
-			} else {
-				flag++
-			}
-		}
-		//delete "**.."from name
-		stars := name[0:flag]
-		name = name[flag:]
+		stars,name := getPrefixStars(name)
 		//add prefix stars in typ
 		typ = stars + typ
 		//package ans
 		convertedCodeLine = name + "	" + typ + suffixAnnotation
+
+	//len > 2
+	}else {
+		//[long long *a, *b, *c]
+		//l := len(lineSlice)
+		if lineSlice[0]==lineSlice[1] && lineSlice[0]=="long"{
+			lineSlice[0] = FIELDS_MAP["long long"]
+		}
+		//[*a, *b, *c]
+		typ := lineSlice[0]
+		names := remove(lineSlice,1)[1:]
+
+		stars := ""
+		for index,name := range names{
+			tmpStars,newName := getPrefixStars(name)
+			names[index] = newName
+			stars = tmpStars
+		}
+		typ = stars + typ
+		ans := append(names,typ)
+		convertedCodeLine = strings.Join(ans,"	")
 
 	}
 	//int *a,*b,*c,*d; ---> a,b,c,d *int
@@ -101,6 +112,21 @@ func doConvertStruct(codeLine, suffixAnnotation string) string {
 	return convertedCodeLine
 }
 
+func getPrefixStars(name string)(string,string){
+	//get "**...." from name
+	flag := 0
+	for _, c := range name {
+		if c != '*' {
+			break
+		} else {
+			flag++
+		}
+	}
+	//delete "**.."from name
+	stars := name[0:flag]
+	name = name[flag:]
+	return stars,name
+}
 func handleInputStruct() []string {
 	retStrs := make([]string, 0)
 	input := bufio.NewReader(os.Stdin)
