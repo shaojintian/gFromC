@@ -8,15 +8,14 @@
 Features:
 
 - [x] Support basic operations
-- [ ] Support multiple arg name ,eg: int a,b,c,d
-- [ ] Support long long
+- [x] Support multiple arg name ,eg: int a,b,c,d
+- [x] Support C array -> Go slice
 
  
 
-
 ```go
 
-go run convertStruct.go < input.txt > ans.txt
+go run ./ < input.txt > ans.txt
 
 
 paste C struct code in ./input.txt 
@@ -27,7 +26,7 @@ converted result is in ./ans.txt
 
 eg:
 
-paste this in terminal 
+paste this in input.txt
 
 ```go
 struct redisCommand {
