@@ -74,6 +74,11 @@ func doConvertStruct(codeLine, suffixAnnotation string) string {
 	if len(lineSlice) < 2 {
 		return codeLine + suffixAnnotation
 	} else if len(lineSlice) == 2{
+		//check tpe change
+		//long -> int32
+		if goTyp,ok := FIELDS_MAP[lineSlice[0]];ok{
+			lineSlice[0] = goTyp
+		}
 		typ := lineSlice[0]
 		name := lineSlice[1]
 		//get "**...." from name
@@ -81,16 +86,36 @@ func doConvertStruct(codeLine, suffixAnnotation string) string {
 		//add prefix stars in typ
 		typ = stars + typ
 		//package ans
+		//name custom change
+		if newName ,ok := FIELDS_MAP[name];ok{
+			name = newName
+		}
+		//typ custom change
+		if newTyp,ok := FIELDS_MAP[typ];ok{
+			typ = newTyp
+		}
+		//snake case change to camel case
+		name = snakeToCamel(name)
 		convertedCodeLine = name + "	" + typ + suffixAnnotation
 
 	//len > 2
 	}else {
 		//[int64 *a, *b, *c]
 		//redisCommand *cmd, *lastcmd;
-		//l := len(lineSlice)
-		if lineSlice[0]==lineSlice[1] && lineSlice[0]=="long"{
-			lineSlice[0] = FIELDS_MAP["long long"]
-			lineSlice = remove(lineSlice,1)
+		//handle long/ long long
+		if lineSlice[0]=="long"{
+			if lineSlice[0] == lineSlice[1]{
+				lineSlice[1] = FIELDS_MAP["long long"]
+				lineSlice = lineSlice[1:]
+			}
+		}
+		//handle long long
+		if lineSlice[0] == "unsigned"{
+			prefix := "u"
+			if goTyp,ok:= FIELDS_MAP[lineSlice[1]];ok{
+				lineSlice[1] = prefix+goTyp
+				lineSlice = lineSlice[1:]
+			}
 		}
 		//[*a, *b, *c]
 		typ := lineSlice[0]
@@ -99,12 +124,22 @@ func doConvertStruct(codeLine, suffixAnnotation string) string {
 		stars := ""
 		for index,name := range names{
 			tmpStars,newName := getPrefixStars(name)
+			//name custom change
+			if customName ,ok := FIELDS_MAP[newName];ok{
+				newName = customName
+			}
+			//snake case change to camel case
+			newName = snakeToCamel(newName)
 			names[index] = newName
 			stars = tmpStars
 		}
+		//typ custom change
+		if newTyp,ok := FIELDS_MAP[typ];ok{
+			typ = newTyp
+		}
 		typ = stars + typ
 		ans := append(names,typ)
-		convertedCodeLine = strings.Join(ans,"	")
+		convertedCodeLine = strings.Join(ans,"	") + suffixAnnotation
 
 	}
 	//int *a,*b,*c,*d; ---> a,b,c,d *int
