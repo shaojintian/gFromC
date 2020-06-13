@@ -3,7 +3,17 @@
 
 将C语言翻译为Go语言的简单工具
 
-## How to use convert C struct 
+# Quick Usage V0.1
+
+## How to convert C function 
+
+Features:
+
+- [x] Support simple functions conversion
+- [x] Support channel/goroutine from pthread
+- [ ] Support Go function type bind
+
+## How to convert C struct 
 
 Features:
 
@@ -36,3 +46,5 @@ struct structName {
     
 };
 ```
+
+##
