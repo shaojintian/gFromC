@@ -191,7 +191,13 @@ func handleInputStruct() []string {
 		curLine = strings.TrimSpace(curLine)
 		//panicErr(err)
 		//check input illegal
-		if len(retStrs) == 0 && ((len(curLine) >= 2 && (curLine[:2] == "//" || curLine[:2] == "/*")) || len(curLine) > 0 && curLine[:1] == "*") {
+		if len(retStrs) == 0 && len(curLine) == 0{
+			continue
+		}
+		if len(retStrs) == 0 &&
+			(
+				(len(curLine) >= 2 && (curLine[:2] == "//" || curLine[:2] == "/*")) ||
+					(len(curLine) > 0 && curLine[:1] == "*")) {
 			fmt.Println(curLine)
 			continue
 		}
