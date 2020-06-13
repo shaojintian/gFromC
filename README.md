@@ -28,10 +28,10 @@ eg:
 
 paste this in input.txt
 
-```go
-struct redisCommand {
+```c
+struct structName {
     
-    //annotation
+    //xxxxxxxx
     char *name;
     
 };
