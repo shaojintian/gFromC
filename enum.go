@@ -11,4 +11,6 @@ var FIELDS_MAP = map[string]string{
 	"unsigned long":"uint32",
 	"int": "int",
 	"char": "rune",
+	"*rune": "string",
+	"unsigned long long":"uint64",
 }

@@ -7,6 +7,16 @@ import (
 	"strings"
 )
 
+func main() {
+
+	//--------------input struct C code---------
+	input := handleInputStruct()
+
+	//-------------handle input-------------
+	convertStruct(input)
+
+}
+
 func convertStruct(input []string) {
 	suffixAnnotation := ""
 
@@ -22,7 +32,12 @@ func convertStruct(input []string) {
 		//handle first line
 		if index == 0 {
 			lineSlice := strings.Fields(line)
-			fmt.Println("type " + lineSlice[1] + " struct {")
+
+			if len(lineSlice)>1 && lineSlice[0] == "struct"{
+				fmt.Println("type " + lineSlice[1] + " struct {")
+			}else if len(lineSlice) > 2{
+				fmt.Println("type " + lineSlice[2] + " struct {")
+			}
 			continue
 		}
 		//handle finish line
@@ -102,8 +117,6 @@ func doConvertStruct(codeLine, suffixAnnotation string) string {
 
 		//len > 2
 	} else {
-		//[int64 *a, *b, *c]
-		//redisCommand *cmd, *lastcmd;
 		//handle long/ long long
 		if lineSlice[0] == "long" {
 			if lineSlice[0] == lineSlice[1] {
@@ -111,10 +124,13 @@ func doConvertStruct(codeLine, suffixAnnotation string) string {
 				lineSlice = lineSlice[1:]
 			}
 		}
-		//handle long long
+		//handle unsigned l l
 		if lineSlice[0] == "unsigned" {
 			prefix := "u"
-			if goTyp, ok := FIELDS_MAP[lineSlice[1]]; ok {
+			if len(lineSlice) > 2 && lineSlice[1] == lineSlice[2] && lineSlice[1] == "long"{
+				lineSlice[2] = FIELDS_MAP["unsigned long long"]
+				lineSlice = lineSlice[2:]
+			}else if goTyp, ok := FIELDS_MAP[lineSlice[1]]; ok {
 				lineSlice[1] = prefix + goTyp
 				lineSlice = lineSlice[1:]
 			}
@@ -175,10 +191,11 @@ func handleInputStruct() []string {
 		curLine = strings.TrimSpace(curLine)
 		//panicErr(err)
 		//check input illegal
-		if len(retStrs) == 0 && len(curLine) <= 6 {
+		if len(retStrs) == 0 && ((len(curLine) >= 2 && (curLine[:2] == "//" || curLine[:2] == "/*")) || len(curLine) > 0 && curLine[:1] == "*") {
+			fmt.Println(curLine)
 			continue
 		}
-		if len(retStrs) == 0 && len(curLine) > 6 && curLine[0:6] != "struct" {
+		if len(retStrs) == 0 && len(curLine) > 6 && curLine[0:6] != "struct" && curLine[0:7] != "typedef" {
 			fmt.Println("please input legal struct C code")
 			os.Exit(0)
 		}
@@ -190,16 +207,6 @@ func handleInputStruct() []string {
 	}
 
 	return retStrs
-}
-
-func main() {
-
-	//--------------input struct C code---------
-	input := handleInputStruct()
-
-	//-------------handle input-------------
-	convertStruct(input)
-
 }
 
 func panicErr(err error) {
