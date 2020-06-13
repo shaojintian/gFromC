@@ -73,47 +73,49 @@ func doConvertStruct(codeLine, suffixAnnotation string) string {
 	}
 	if len(lineSlice) < 2 {
 		return codeLine + suffixAnnotation
-	} else if len(lineSlice) == 2{
+	} else if len(lineSlice) == 2 {
 		//check tpe change
-		//long -> int32
-		if goTyp,ok := FIELDS_MAP[lineSlice[0]];ok{
+		//rune a[10]
+		if goTyp, ok := FIELDS_MAP[lineSlice[0]]; ok {
 			lineSlice[0] = goTyp
 		}
 		typ := lineSlice[0]
 		name := lineSlice[1]
 		//get "**...." from name
-		stars,name := getPrefixStars(name)
-		//add prefix stars in typ
-		typ = stars + typ
+		stars, name := getPrefixStars(name)
+		//add prefix stars or [] in typ
+		name, brackets := getSquareBracketsFromName(name)
+		typ = brackets + stars + typ
 		//package ans
+		//------------- handle name ------------
 		//name custom change
-		if newName ,ok := FIELDS_MAP[name];ok{
+		if newName, ok := FIELDS_MAP[name]; ok {
 			name = newName
-		}
-		//typ custom change
-		if newTyp,ok := FIELDS_MAP[typ];ok{
-			typ = newTyp
 		}
 		//snake case change to camel case
 		name = snakeToCamel(name)
+		//typ custom change
+		if newTyp, ok := FIELDS_MAP[typ]; ok {
+			typ = newTyp
+		}
 		convertedCodeLine = name + "	" + typ + suffixAnnotation
 
-	//len > 2
-	}else {
+		//len > 2
+	} else {
 		//[int64 *a, *b, *c]
 		//redisCommand *cmd, *lastcmd;
 		//handle long/ long long
-		if lineSlice[0]=="long"{
-			if lineSlice[0] == lineSlice[1]{
+		if lineSlice[0] == "long" {
+			if lineSlice[0] == lineSlice[1] {
 				lineSlice[1] = FIELDS_MAP["long long"]
 				lineSlice = lineSlice[1:]
 			}
 		}
 		//handle long long
-		if lineSlice[0] == "unsigned"{
+		if lineSlice[0] == "unsigned" {
 			prefix := "u"
-			if goTyp,ok:= FIELDS_MAP[lineSlice[1]];ok{
-				lineSlice[1] = prefix+goTyp
+			if goTyp, ok := FIELDS_MAP[lineSlice[1]]; ok {
+				lineSlice[1] = prefix + goTyp
 				lineSlice = lineSlice[1:]
 			}
 		}
@@ -122,10 +124,10 @@ func doConvertStruct(codeLine, suffixAnnotation string) string {
 		names := lineSlice[1:]
 
 		stars := ""
-		for index,name := range names{
-			tmpStars,newName := getPrefixStars(name)
+		for index, name := range names {
+			tmpStars, newName := getPrefixStars(name)
 			//name custom change
-			if customName ,ok := FIELDS_MAP[newName];ok{
+			if customName, ok := FIELDS_MAP[newName]; ok {
 				newName = customName
 			}
 			//snake case change to camel case
@@ -134,12 +136,12 @@ func doConvertStruct(codeLine, suffixAnnotation string) string {
 			stars = tmpStars
 		}
 		//typ custom change
-		if newTyp,ok := FIELDS_MAP[typ];ok{
+		if newTyp, ok := FIELDS_MAP[typ]; ok {
 			typ = newTyp
 		}
 		typ = stars + typ
-		ans := append(names,typ)
-		convertedCodeLine = strings.Join(ans,"	") + suffixAnnotation
+		ans := append(names, typ)
+		convertedCodeLine = strings.Join(ans, "	") + suffixAnnotation
 
 	}
 	//int *a,*b,*c,*d; ---> a,b,c,d *int
@@ -149,7 +151,7 @@ func doConvertStruct(codeLine, suffixAnnotation string) string {
 	return convertedCodeLine
 }
 
-func getPrefixStars(name string)(string,string){
+func getPrefixStars(name string) (string, string) {
 	//get "**...." from name
 	flag := 0
 	for _, c := range name {
@@ -162,7 +164,7 @@ func getPrefixStars(name string)(string,string){
 	//delete "**.."from name
 	stars := name[0:flag]
 	name = name[flag:]
-	return stars,name
+	return stars, name
 }
 func handleInputStruct() []string {
 	retStrs := make([]string, 0)
@@ -204,6 +206,16 @@ func panicErr(err error) {
 	if err != nil {
 		panic(fmt.Errorf("---------error: %v", err))
 	}
+}
+
+func getSquareBracketsFromName(name string) (string, string) {
+	for i, char := range name {
+		if char == '[' {
+			name = name[:i]
+			return name, "[]"
+		}
+	}
+	return name, ""
 }
 
 /**
