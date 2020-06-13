@@ -85,14 +85,16 @@ func doConvertStruct(codeLine, suffixAnnotation string) string {
 
 	//len > 2
 	}else {
-		//[long long *a, *b, *c]
+		//[int64 *a, *b, *c]
+		//redisCommand *cmd, *lastcmd;
 		//l := len(lineSlice)
 		if lineSlice[0]==lineSlice[1] && lineSlice[0]=="long"{
 			lineSlice[0] = FIELDS_MAP["long long"]
+			lineSlice = remove(lineSlice,1)
 		}
 		//[*a, *b, *c]
 		typ := lineSlice[0]
-		names := remove(lineSlice,1)[1:]
+		names := lineSlice[1:]
 
 		stars := ""
 		for index,name := range names{
@@ -132,9 +134,9 @@ func handleInputStruct() []string {
 	input := bufio.NewReader(os.Stdin)
 
 	for {
-		curLine, err := input.ReadString('\n')
+		curLine, _ := input.ReadString('\n')
 		curLine = strings.TrimSpace(curLine)
-		panicErr(err)
+		//panicErr(err)
 		//check input illegal
 		if len(retStrs) == 0 && len(curLine) <= 6 {
 			continue
@@ -165,7 +167,7 @@ func main() {
 
 func panicErr(err error) {
 	if err != nil {
-		panic(fmt.Errorf("---------%v", err))
+		panic(fmt.Errorf("---------error: %v", err))
 	}
 }
 
